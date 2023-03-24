@@ -1,4 +1,3 @@
-const ApiError = require('../error/ApiError')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User} = require('../models/models')
@@ -20,17 +19,17 @@ class UserController {
         }
         const {name, email, password} = req.body
         if (!name) {
-            return next(ApiError.badRequest)('Incorrect name')
+            res.status(400).json({message: 'Incorrect name', errors})
         } else if (!email) {
-            return next(ApiError.badRequest)('Incorrect email')
+            res.status(400).json({message: 'Incorrect email', errors})
         } else if (!password) {
-            return next(ApiError.badRequest('Incorrect password'))
+            res.status(400).json({message: 'Incorrect password', errors})
         }
 
         const candidate = await User.findOne({where: {email}})
 
         if (candidate) {
-            return next(ApiError.badRequest('User with this email already exists'))
+            res.status(400).json({message: 'User with this email already exists', errors})
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({name, email, password: hashPassword})
@@ -43,14 +42,14 @@ class UserController {
         const {email, password} = req.body
         const user = await User.findOne({where: {email}})
         if (!user) {
-            return next(ApiError.internal('User not found'))
+            res.status(500).send('User not found')
         }
         if (user.status === 'blocked') {
-            return next(ApiError.badRequest('you blocked'))
+            res.status(500).send('You blocked')
         }
         let comparePassword = bcrypt.compareSync(password, user.password)
         if (!comparePassword) {
-            return next(ApiError.internal('Wrong password'))
+            res.status(500).send('Wrong password')
         }
         const token = generateJwt(user.id, user.email)
         return res.json({token})
@@ -73,6 +72,7 @@ class UserController {
             const user = await User.update({status}, {where: {id}})
             return res.json(user)
         } catch (error) {
+            console.error(error)
             res.status(500).json({message: 'Failed to update status', error})
         }
     }
