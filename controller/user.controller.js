@@ -51,9 +51,8 @@ class UserController {
         if (!comparePassword) {
             res.status(500).send('Wrong password')
         }
+        await User.update({last_login_time: new Date()})
         const token = generateJwt(user.id, user.email)
-        user.set('last_login_time', new Date())
-        user.save()
         return res.json({token})
     }
 
