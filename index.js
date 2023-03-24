@@ -6,10 +6,12 @@ const app = express()
 const PORT = process.env.PORT || 8080
 const router = require('./routes/user.routes')
 const cors = require('cors')
+const errorHandler = require('./middleware/errorHandlerMiddleware')
 
 app.use(cors())
 app.use(express.json())
 app.use('/api', router)
+app.use(errorHandler)
 
 app.get('/', (req, res) => {
     res.status(200).json({message: 'Working!'})

@@ -15,7 +15,7 @@ const generateJwt = (id, email) => {
 class UserController {
     async registerNewUser(req, res, next) {
         const errors = validationResult(req)
-        if(!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             res.status(400).json({message: 'Error during registration', errors})
         }
         const {name, email, password} = req.body
@@ -45,7 +45,7 @@ class UserController {
         if (!user) {
             return next(ApiError.internal('User not found'))
         }
-        if (user.status === 'blocked'){
+        if (user.status === 'blocked') {
             return next(ApiError.badRequest('you blocked'))
         }
         let comparePassword = bcrypt.compareSync(password, user.password)
@@ -57,14 +57,18 @@ class UserController {
     }
 
     async getUsers(req, res) {
-        const users = await User.findAll()
-        return res.json(users)
+        try {
+            const users = await User.findAll()
+            return res.json(users)
+        } catch (e) {
+            console.error(e)
+            res.status(500).send('Server not responding')
+        }
     }
 
     async updateStatus(req, res) {
-
-            const {id} = req.params
-            const {status} = req.body
+        const {id} = req.params
+        const {status} = req.body
         try {
             const user = await User.update({status}, {where: {id}})
             return res.json(user)
@@ -73,25 +77,22 @@ class UserController {
         }
     }
 
-    async deleteUser(req, res){
+    async deleteUser(req, res) {
         try {
-            const { id } = req.params;
-            const user = await User.findByPk(id);
-
+            const {id} = req.params
+            const user = await User.findByPk(id)
             if (!user) {
-                return res.status(404).json({ message: 'User not found' });
+                return res.status(404).json({message: 'User not found'})
             }
-
-            await user.destroy();
-
-            return res.status(204).end();
+            await user.destroy()
+            return res.status(204).end()
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ message: 'Internal server error' });
+            console.error(error)
+            return res.status(500).json({message: 'Internal server error'})
         }
     }
 
-    async check(req, res, next) {
+    async check(req, res,) {
         const token = generateJwt((req.user.id, req.user.email))
         return res.json({token})
     }
