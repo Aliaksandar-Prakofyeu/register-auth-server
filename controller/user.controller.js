@@ -57,7 +57,7 @@ class UserController {
     }
 
     async getUsers(req, res) {
-        const users = await User.findAndCountAll()
+        const users = await User.findAll()
         return res.json(users)
     }
 
