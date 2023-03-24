@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User} = require('../models/models')
-const {where} = require('sequelize')
+const {where, DataTypes} = require('sequelize')
 const {validationResult} = require('express-validator')
 
 const generateJwt = (id, email) => {
@@ -34,7 +34,7 @@ class UserController {
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({name, email, password: hashPassword})
         const token = generateJwt(user.id, user.email)
-        user.last_login_time= Date.now()
+        user.last_login_time = new Date()
         await user.save()
         return res.json({token})
 
@@ -54,7 +54,7 @@ class UserController {
             res.status(500).send('Wrong password')
         }
         const token = generateJwt(user.id, user.email)
-        user.last_login_time=Date.now()
+        user.last_login_time = new Date()
         await user.save()
         return res.json({token})
     }
