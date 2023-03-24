@@ -34,7 +34,7 @@ class UserController {
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({name, email, password: hashPassword})
         const token = generateJwt(user.id, user.email)
-        user.changed('last_login_time', true)
+        user.set('last_login_time', new Date())
         await user.save()
         return res.json({token})
 
@@ -54,7 +54,7 @@ class UserController {
             res.status(500).send('Wrong password')
         }
         const token = generateJwt(user.id, user.email)
-        user.changed('last_login_time', true)
+        user.set('last_login_time', new Date())
         await user.save()
         return res.json({token})
     }
