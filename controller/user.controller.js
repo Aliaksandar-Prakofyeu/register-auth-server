@@ -90,6 +90,11 @@ class UserController {
             return res.status(500).json({ message: 'Internal server error' });
         }
     }
+
+    async check(req, res) {
+        const token = generateJwt((req.user.id, req.user.email))
+        return res.json({token})
+    }
 }
 
 module.exports = new UserController()
