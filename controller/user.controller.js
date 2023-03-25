@@ -34,27 +34,28 @@ class UserController {
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({name, email, password: hashPassword})
         const token = generateJwt(user.id, user.email)
-        user.last_login_time = new Date()
+        user.changed('last_login_time', true)
         await user.save()
         return res.json({token})
 
     }
 
     async login(req, res, next) {
+        const errors = validationResult(req)
         const {email, password} = req.body
         const user = await User.findOne({where: {email}})
         if (!user) {
-            res.status(500).send('User not found')
+            res.status(500).json({message: 'User not found', errors})
         }
         if (user.status === 'blocked') {
-            res.status(500).send('You blocked')
+            res.status(500).json({message: 'You blocked', errors})
         }
         let comparePassword = bcrypt.compareSync(password, user.password)
         if (!comparePassword) {
-            res.status(500).send('Wrong password')
+            res.status(500).json({message: 'Wrong password', errors})
         }
         const token = generateJwt(user.id, user.email)
-        user.last_login_time = new Date()
+        user.changed('last_login_time', true)
         await user.save()
         return res.json({token})
     }
@@ -63,9 +64,9 @@ class UserController {
         try {
             const users = await User.findAll()
             return res.json(users)
-        } catch (e) {
-            console.error(e)
-            res.status(500).send('Server not responding')
+        } catch (error) {
+            console.error(error)
+            res.status(500).json({message: 'Server not responding'})
         }
     }
 
