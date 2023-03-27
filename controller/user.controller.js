@@ -13,9 +13,8 @@ const generateJwt = (id, email) => {
 class UserController {
     async registerNewUser(req, res, next) {
         const errors = validationResult(req)
-         const error = errors.mapped()
         if (!errors.isEmpty()) {
-            res.status(400).json({message: errors[0].msg})
+            res.status(400).json({message: `${errors[0].msg}`})
         }
         const {name, email, password} = req.body
         if (!name) {
@@ -43,7 +42,7 @@ class UserController {
     async login(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(400).json({message: errors[0].msg})
+            res.status(400).json({message: `${errors[0].msg}`})
         }
         const {email, password} = req.body
         const user = await User.findOne({where: {email}})
