@@ -14,8 +14,9 @@ class UserController {
     async registerNewUser(req, res, next) {
         const errors = validationResult(req)
          const error = errors.mapped()
+        error.errors.errors[0].msg
         if (!errors.isEmpty()) {
-            res.status(400).json({message: `${Object.values(error)[1]}`, errors})
+            res.status(400).json({message: `${error.errors.errors[0].msg}`, errors})
         }
         const {name, email, password} = req.body
         if (!name) {
@@ -44,7 +45,7 @@ class UserController {
         const errors = validationResult(req)
         const error = errors.mapped()
         if (!errors.isEmpty()) {
-            res.status(400).json({message: `${Object.values(error)[1]}`, errors})
+            res.status(400).json({message: `${error.errors.errors[0].msg}`, errors})
         }
         const {email, password} = req.body
         const user = await User.findOne({where: {email}})
