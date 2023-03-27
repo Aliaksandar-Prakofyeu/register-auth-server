@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const {User} = require('../models/models')
-const {where, DataTypes} = require('sequelize')
 const {validationResult} = require('express-validator')
 
 const generateJwt = (id, email) => {
@@ -15,7 +14,7 @@ class UserController {
     async registerNewUser(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(400).json({message: 'Error during registration', errors})
+            res.status(400).json({message: `${errors}`, errors})
         }
         const {name, email, password} = req.body
         if (!name) {
