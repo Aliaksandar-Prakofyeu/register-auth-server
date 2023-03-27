@@ -14,7 +14,7 @@ class UserController {
     async registerNewUser(req, res, next) {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
-            res.status(400).json({message: `${errors}`, errors})
+            res.status(400).json({message: `${errors.mapped()}`, errors})
         }
         const {name, email, password} = req.body
         if (!name) {
