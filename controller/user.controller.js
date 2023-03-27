@@ -18,17 +18,17 @@ class UserController {
         }
         const {name, email, password} = req.body
         if (!name) {
-            res.status(400).json({message: 'Incorrect name', errors})
+            res.status(400).json({message: 'Incorrect name'})
         } else if (!email) {
-            res.status(400).json({message: 'Incorrect email', errors})
+            res.status(400).json({message: 'Incorrect email'})
         } else if (!password) {
-            res.status(400).json({message: 'Incorrect password', errors})
+            res.status(400).json({message: 'Incorrect password'})
         }
 
         const candidate = await User.findOne({where: {email}})
 
         if (candidate) {
-            res.status(400).json({message: 'User with this email already exists', errors})
+            res.status(400).json({message: 'User with this email already exists'})
         }
         const hashPassword = await bcrypt.hash(password, 5)
         const user = await User.create({name, email, password: hashPassword})
@@ -47,14 +47,14 @@ class UserController {
         const {email, password} = req.body
         const user = await User.findOne({where: {email}})
         if (!user) {
-            res.status(500).json({message: 'User not found', errors})
+            res.status(500).json({message: 'User not found'})
         }
         if (user.status === 'blocked') {
-            res.status(500).json({message: 'You blocked', errors})
+            res.status(500).json({message: 'You blocked'})
         }
         let comparePassword = bcrypt.compareSync(password, user.password)
         if (!comparePassword) {
-            res.status(500).json({message: 'Wrong password', errors})
+            res.status(500).json({message: 'Wrong password'})
         }
         const token = generateJwt(user.id, user.email)
         user.changed('last_login_time', true)
